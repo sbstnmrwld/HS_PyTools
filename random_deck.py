@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 from bs4 import BeautifulSoup
 from collections import Counter
 import argparse
@@ -118,7 +118,7 @@ def main():
     d_collection = create_d_collection(cclass, l_blacklist)
     d_random = create_d_random(d_collection, cclass)
 
-    print d_random
+    print(d_random)
 
 if __name__ == '__main__':
     main()
