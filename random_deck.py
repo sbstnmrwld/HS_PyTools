@@ -107,7 +107,6 @@ def create_d_random(collection, cclass):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("cclass", type=str)
-    parser.add_argument("-")
     args = parser.parse_args()
 
     cclass = str(args.cclass)
