@@ -88,18 +88,21 @@ def create_d_random(collection, cclass):
     # sum_class_cards = 0
     # sum_none_cards = 0
 
-    sum_class_cards = 0
+    s_cc = 0
+    s_nc = 0
+
     i = 0
     while (i < 30):
         c = collection.random()
-        if (c.cclass == cclass) and (sum_class_cards < 15):
+        if (c.cclass == cclass) and (s_cc < 15):
             d.take_card(c)
             collection.drop_card(c)
-            sum_class_cards += 1
+            s_cc += 1
             i += 1
-        elif (c.cclass == "NONE") and (sum_class_cards < 15):
+        elif (c.cclass == "NONE") and (s_nc < 15):
             d.take_card(c)
             collection.drop_card(c)
+            s_nc += 1
             i += 1
     return d
 
