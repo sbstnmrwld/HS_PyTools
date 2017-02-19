@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# !/usr/bin/env python3
+
 import os
 import sys
 
@@ -12,11 +14,11 @@ class CardImporter(object):
         self.filename = filename
 
     def run(self):
-        print "\n # Importing: " + self.filename
+        print("[+] Importing: " + self.filename + "\n")
         for item in self.get_file_contents():
             if not item or item.startswith('#'):
                 continue
-            print item
+            print("[+] " + item)
             number_of_cards, card_name = item.split(' ', 1)
             self.search(card_name)
             self.choose(number_of_cards)
