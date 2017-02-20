@@ -1,84 +1,68 @@
+# -*- coding: utf-8 -*-
+# !/usr/bin/env python3
+
 from bs4 import BeautifulSoup
-from deck_importer import import_cards
-from _functions import write_deck_file
-import os
+from lib.classes import Card, Deck
+import argparse
 import requests
 import sys
 
-deck_data = ""
 
+class DeckDownloader(object):
+    def __init__(self, url):
+        self.deck = Deck()
+        self.filename = url.rsplit('/', 1)[-1]
+        self.path = ""
+        self.url = url
 
-def sort_parameters():
-    global args_switch
-    global deck_url
+    def run(self):
+        self.check()
+        self.deck.save(path="%s%s" % (self.path, self.filename))
 
-    if len(sys.argv) == 2:
-        deck_url = sys.argv[1]
-    elif len(sys.argv) == 3:
-        args_switch = os.path.expanduser(sys.argv[1])
-        deck_url = os.path.expanduser(sys.argv[2])
-        if "-i" not in args_switch:
-            sys.exit('unknown parameter: ' + args_switch)
+    def check(self):
+        websites = ("hearthpwn.com/decks/",
+                    "icy-veins.com/hearthstone/")
 
-    if "http" not in deck_url:
-            sys.exit('Error: no URL found')
+        if any(item in self.url for item in websites):
+            self.download()
+        else:
+            sys.exit("[-] unknown website: %s" % self.url)
 
-
-def check_website(deck_url):
-    if "hearthpwn.com/decks/" in deck_url:
-        hearthpwn_deck(deck_url)
-    elif "icy-veins.com/hearthstone/" in deck_url:
-        icyveins_deck(deck_url)
-    else:
-        sys.exit("unknown website: " + deck_url)
-
-
-def icyveins_deck(deck_url):
-    global deck_path
-    deck_list = []
-
-    deck_data = requests.get(deck_url).text
-    deck_data = BeautifulSoup(deck_data, 'html.parser')
-    deck_data = deck_data.findAll("table", {"class": "deck_card_list"})
-    deck_data = deck_data[0].findAll('li')
-
-    deck_path = "_decks/icyveins/" + deck_url.rsplit('/', 1)[-1]
-
-    for item in deck_data:
-        deck_list.append(item.text[0] + " " + item.a.text)
-
-    deck_list.append("\n# " + deck_url)
-
-    write_deck_file(deck_path, deck_list)
-
-
-def hearthpwn_deck(deck_url):
-    global deck_path
-    deck_list = []
-
-    deck_data = requests.get(deck_url).text
-    deck_data = BeautifulSoup(deck_data, 'html.parser')
-    deck_data = deck_data.findAll("aside", {"class": "infobox"})
-    deck_data = deck_data[0].findAll('a')
-
-    deck_path = "_decks/hearthpwn/" + deck_url.rsplit('/', 1)[-1]
-
-    for item in deck_data:
-        if item.has_attr('data-count'):     # if link is card
-            deck_list.append(item['data-count'] + " " + item.string[7:-6])
-
-    deck_list.append("\n# " + deck_url)
-
-    write_deck_file(deck_path, deck_list)
+    def download(self):
+        print("[+] Downloading deck from %s" % self.url)
+        if "hearthpwn" in self.url:
+            self.path = "_decks/hearthpwn/"
+            data = requests.get(self.url).text
+            data = BeautifulSoup(data, 'html.parser')
+            data = data.findAll("aside", {"class": "infobox"})
+            data = data[0].findAll('a')
+            for item in data:
+                if item.has_attr('data-count'):
+                    c = Card(item.string[7:-6], "", "")
+                    self.deck.take_card(c)
+                    if int(item["data-count"]) == 2:
+                        self.deck.take_card(c)
+        elif "icy-veins" in self.url:
+            self.path = "_decks/icyveins/"
+            data = requests.get(self.url).text
+            data = BeautifulSoup(data, 'html.parser')
+            data = data.findAll("table", {"class": "deck_card_list"})
+            data = data[0].findAll('li')
+            for item in data:
+                c = Card(item.a.text, "", "")
+                self.deck.take_card(c)
+                if int(item.text[0]) == 2:
+                    self.deck.take_card(c)
 
 
 def main():
-    sort_parameters()
-    check_website(deck_url)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("url", type=str)
+    parser.add_argument("-i", "--import", action="store_true")
+    args = parser.parse_args()
 
-    if "args_switch" in globals():
-        if args_switch == "-i":
-            import_cards(deck_path)
+    downloader = DeckDownloader(url=args.url)
+    downloader.run()
 
 
 if __name__ == '__main__':
