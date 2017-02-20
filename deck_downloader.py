@@ -3,21 +3,29 @@
 
 from bs4 import BeautifulSoup
 from lib.classes import Card, Deck
+from deck_importer import DeckImporter
 import argparse
 import requests
 import sys
 
 
 class DeckDownloader(object):
-    def __init__(self, url):
+    def __init__(self, url, importer=False):
         self.deck = Deck()
         self.filename = url.rsplit('/', 1)[-1]
         self.path = ""
         self.url = url
+        self.importer = importer
 
     def run(self):
         self.check()
         self.deck.save(path="%s%s" % (self.path, self.filename))
+
+        print(self.importer)
+
+        if self.importer:
+            importer = DeckImporter(filename="%s%s" % (self.path, self.filename))
+            importer.run()
 
     def check(self):
         websites = ("hearthpwn.com/decks/",
@@ -58,10 +66,12 @@ class DeckDownloader(object):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("url", type=str)
-    parser.add_argument("-i", "--import", action="store_true")
+    parser.add_argument("-i", "--importer", action="store_true")
     args = parser.parse_args()
 
-    downloader = DeckDownloader(url=args.url)
+    print(args)
+
+    downloader = DeckDownloader(url=args.url, importer=args.importer)
     downloader.run()
 
 
