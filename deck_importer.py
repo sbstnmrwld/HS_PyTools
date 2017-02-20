@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python3
 
+from lib.classes import CardImporter
+import argparse
 import os
-import sys
 
 
-class CardImporter(object):
+class DeckImporter(object):
     pos_mouse_search = "966 990"
     pos_mouse_card = "418 468"
     pos_mouse_card_gold = "652 468"
@@ -30,21 +31,25 @@ class CardImporter(object):
         return lines
 
     def search(self, card_name):
-        os.system("xdotool mousemove " + CardImporter.pos_mouse_search)
+        os.system("xdotool mousemove " + DeckImporter.pos_mouse_search)
         os.system("xdotool click 1")
         os.system("xdotool type --delay 25 \"" + card_name + "\"")
         os.system("xdotool key \"Return\"")
 
     def choose(self, number_of_cards):
         if number_of_cards == "2":
-            os.system("xdotool mousemove " + CardImporter.pos_mouse_card_gold)
+            os.system("xdotool mousemove " + DeckImporter.pos_mouse_card_gold)
             os.system("xdotool click --repeat " + number_of_cards + " 1")
-        os.system("xdotool mousemove " + CardImporter.pos_mouse_card)
+        os.system("xdotool mousemove " + DeckImporter.pos_mouse_card)
         os.system("xdotool click --repeat " + number_of_cards + " 1")
 
 
 def main():
-    deck_file_name = os.path.expanduser(sys.argv[1])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file", type=str)
+    args = parser.parse_args()
+
+    deck_file_name = str(args.file)
 
     importer = CardImporter(filename=deck_file_name)
     importer.run()
