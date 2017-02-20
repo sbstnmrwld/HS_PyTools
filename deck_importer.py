@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # !/usr/bin/env python3
 
-from lib.classes import CardImporter
 import argparse
 import os
 
@@ -15,11 +14,11 @@ class DeckImporter(object):
         self.filename = filename
 
     def run(self):
-        print("[+] Importing: " + self.filename + "\n")
+        print("[+] Importing: %s" % self.filename)
         for item in self.get_file_contents():
             if not item or item.startswith('#'):
                 continue
-            print("[+] " + item)
+            print("    %s" % item)
             number_of_cards, card_name = item.split(' ', 1)
             self.search(card_name)
             self.choose(number_of_cards)
@@ -51,7 +50,7 @@ def main():
 
     deck_file_name = str(args.file)
 
-    importer = CardImporter(filename=deck_file_name)
+    importer = DeckImporter(filename=deck_file_name)
     importer.run()
 
 
