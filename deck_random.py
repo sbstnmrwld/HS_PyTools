@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from lib.classes import Card, Deck
 import argparse
 import json
+import time
 
 
 class DeckRandom(object):
@@ -18,6 +19,7 @@ class DeckRandom(object):
         self.blacklist()
         self.collection()
         self.random()
+        self.d_random.save(path="_decks/random/%s_%s" % (self.cclass, time.strftime('%Y%m%d-%H%M%S')))
         print(self.d_random)
 
     def collection(self):
