@@ -21,8 +21,6 @@ class DeckDownloader(object):
         self.check()
         self.deck.save(path="%s%s" % (self.path, self.filename))
 
-        print(self.importer)
-
         if self.importer:
             importer = DeckImporter(filename="%s%s" % (self.path, self.filename))
             importer.run()
@@ -68,8 +66,6 @@ def main():
     parser.add_argument("url", type=str)
     parser.add_argument("-i", "--importer", action="store_true")
     args = parser.parse_args()
-
-    print(args)
 
     downloader = DeckDownloader(url=args.url, importer=args.importer)
     downloader.run()
