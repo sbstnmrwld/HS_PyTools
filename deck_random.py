@@ -39,7 +39,7 @@ class DeckRandom(object):
 
     def blacklist(self):
         print("[+] Creating blacklist")
-        w = ("NAXX", "TGT")
+        w = ("NAXX", "GVG")
         with open("cards.collectible.json") as f:
             data = f.read()
         data = json.loads(data)
