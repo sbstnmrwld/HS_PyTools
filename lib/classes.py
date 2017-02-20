@@ -40,3 +40,9 @@ class Deck(object):
 
     def count_card(self, card):
         return sum(1 for c in self.cards if c.cname == card)
+
+    def save(self, path):
+        l = sorted(Counter([item.cname for item in self.cards]).items())
+        print("[+] Save deck to %s" % path)
+        with open(path, mode='w', encoding='utf-8') as f:
+            f.write('\n'.join(['%d %s' % (count, card) for card, count in l]))
