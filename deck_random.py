@@ -94,5 +94,6 @@ def main():
     random = DeckRandom(cclass=args.cclass, hpwn_user=args.hpwn_user)
     random.run()
 
+
 if __name__ == '__main__':
     main()
