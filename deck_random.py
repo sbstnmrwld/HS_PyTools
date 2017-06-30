@@ -5,22 +5,31 @@ from bs4 import BeautifulSoup
 from lib.classes import Card, Deck
 import argparse
 import json
+import requests
 import time
 
 
 class DeckRandom(object):
-    def __init__(self, cclass):
+    def __init__(self, cclass, hpwn_user):
         self.cclass = cclass.upper()
+        self.hpwn_user = hpwn_user
         self.l_blacklist = []
         self.d_collection = Deck()
         self.d_random = Deck()
 
     def run(self):
         self.blacklist()
+        self.download()
         self.collection()
         self.random()
         self.d_random.save(path="_decks/random/%s_%s" % (self.cclass, time.strftime('%Y%m%d-%H%M%S')))
         print(self.d_random)
+
+    def download(self):
+        print("[+] Downloading collection")
+        collection = requests.get("http://www.hearthpwn.com/members/" + self.hpwn_user + "/collection").text
+        with open("collection.html", mode='w', encoding='utf-8') as f:
+            f.write(collection)
 
     def collection(self):
         print("[+] Creating collection deck")
@@ -39,7 +48,7 @@ class DeckRandom(object):
 
     def blacklist(self):
         print("[+] Creating blacklist")
-        w = ("NAXX", "GVG")
+        w = ("BRM", "GVG", "HOF", "LOE", "NAXX", "TGT")
         with open("cards.collectible.json") as f:
             data = f.read()
         data = json.loads(data)
@@ -79,9 +88,10 @@ class DeckRandom(object):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("cclass", type=str)
+    parser.add_argument("hpwn_user", type=str)
     args = parser.parse_args()
 
-    random = DeckRandom(cclass=args.cclass)
+    random = DeckRandom(cclass=args.cclass, hpwn_user=args.hpwn_user)
     random.run()
 
 if __name__ == '__main__':
